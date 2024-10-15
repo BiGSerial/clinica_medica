@@ -1,6 +1,6 @@
 # Sistema de Gestão para Clínica Médica
 
-Este é um projeto disciplinar desenvolvido para a matéria de **Banco de Dados**, orientado pelo professor **Howard Cruz**. O sistema tem como objetivo gerenciar uma clínica médica, permitindo o cadastro e controle de informações como pacientes, médicos, especialidades e consultas.
+Este é um projeto disciplinar desenvolvido para a matéria de **Banco de Dados**, orientado pelo professor **Howard Roatti**. O sistema tem como objetivo gerenciar uma clínica médica, permitindo o cadastro e controle de informações como pacientes, médicos, especialidades e consultas.
 
 ## Alunos
 
