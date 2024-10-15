@@ -1,4 +1,6 @@
 # src/views/consultaView.py
+import sys
+sys.path.append('.')
 
 from src.app.controllers.consultaController import ConsultaController
 from src.app.models.consulta import Consulta

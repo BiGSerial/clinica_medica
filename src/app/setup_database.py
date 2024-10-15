@@ -1,4 +1,7 @@
 # src/app/setup_database.py
+import sys
+sys.path.append('.')
+
 from src.database.Database import DatabaseConnection
 
 def setup_tables():

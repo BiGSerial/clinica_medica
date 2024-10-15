@@ -1,5 +1,9 @@
 # src/app/views/pacienteView.py
 
+import sys
+sys.path.append('.')
+
+
 from src.app.controllers.pacienteController import PacienteController
 from src.app.models.paciente import Paciente
 

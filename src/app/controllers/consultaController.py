@@ -1,4 +1,6 @@
 # src/app/controllers/consultaController.py
+import sys
+sys.path.append('.')
 
 from src.database.Database import DatabaseConnection
 from src.app.models.consulta import Consulta

@@ -1,4 +1,6 @@
 # src/app/controllers/pacienteController.py
+import sys
+sys.path.append('.')
 
 from src.database.Database import DatabaseConnection
 from src.app.models.paciente import Paciente
@@ -50,7 +52,6 @@ class PacienteController:
             
             if paciente:
                 return Paciente(
-                    id_paciente=paciente[0],
                     nome=paciente[1],
                     cpf=paciente[2],
                     sexo=paciente[3],

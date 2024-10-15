@@ -1,4 +1,6 @@
 # src/app/views/medicoView.py
+import sys
+sys.path.append('.')
 
 from src.app.controllers.medicoController import MedicoController
 from src.app.models.medico import Medico

@@ -1,4 +1,7 @@
 # src/database/Database.py
+import sys
+sys.path.append('.')
+
 import cx_Oracle
 from src.config.Config import Config
 import logging
