@@ -1,11 +1,16 @@
+#src/app/models/consulta.py
 class Consulta:
-    def __init__(self, id_consulta, horario_consulta_realizada, relatorios, data_criacao, id_paciente, id_medico):
-        self.setIdConsulta(id_consulta)
+
+    id_consulta = 0
+
+    def __init__(self, horario_consulta_realizada, relatorios, data_criacao, id_paciente, id_medico, status):
+        
         self.setHorarioConsultaRealizada(horario_consulta_realizada)
         self.setRelatorios(relatorios)
         self.setDataCriacao(data_criacao)
         self.setIdPaciente(id_paciente)
         self.setIdMedico(id_medico)
+        self.setStatus(status)
 
     def getIdConsulta(self):
         return self._id_consulta
@@ -43,7 +48,13 @@ class Consulta:
     def setIdMedico(self, id_medico):
         self._id_medico = id_medico
 
+    def getStatus(self):
+        return self._status
+
+    def setStatus(self, status):
+        self._status = status
+
     def toString(self):
-        return f'ID Consulta: {self._id_consulta}, Horário da Consulta Realizada: {self._horario_consulta_realizada}, Relatórios: {self._relatorios}, Data de Criação: {self._data_criacao}, ID Paciente: {self._id_paciente}, ID Médico: {self._id_medico}'
+        return f'ID Consulta: {self._id_consulta}, Horário da Consulta Realizada: {self._horario_consulta_realizada}, Relatórios: {self._relatorios}, Data de Criação: {self._data_criacao}, ID Paciente: {self._id_paciente}, ID Médico: {self._id_medico}, Status: {self._status}'
 
       

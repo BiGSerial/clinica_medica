@@ -1,5 +1,10 @@
+# src/app/models/medico.py
 class Medico:
+    
+    id_medico:int = 0
+
     def __init__(self, nome, crm, telefone, email, cep, data_nascimento, data_contratacao, data_registro, id_especialidade):
+        self.setIdMedico(self.id_medico)
         self.setNome(nome)
         self.setCrm(crm)
         self.setTelefone(telefone)
@@ -9,6 +14,12 @@ class Medico:
         self.setDataContratacao(data_contratacao)
         self.setDataRegistro(data_registro)
         self.setIdEspecialidade(id_especialidade)
+
+    def setIdMedico(self, id_medico):
+        self.id_medico = id_medico
+    
+    def getIdMedico(self):
+        return self.id_medico
 
     def setNome(self, nome):
         self.nome = nome
@@ -65,4 +76,4 @@ class Medico:
         return self.id_especialidade
     
     def toString(self):
-        return f'Nome: {self.nome}, CRM: {self.crm}, Telefone: {self.telefone}, Email: {self.email}, CEP: {self.cep}, Data de Nascimento: {self.data_nascimento}, Data de Contratação: {self.data_contratacao}, Data de Registro: {self.data_registro}, ID da Especialidade: {self.id_especialidade}'
+        return f'ID Médico: {self.id_medico}, Nome: {self.nome}, CRM: {self.crm}, Telefone: {self.telefone}, Email: {self.email}, CEP: {self.cep}, Data de Nascimento: {self.data_nascimento}, Data de Contratação: {self.data_contratacao}, Data de Registro: {self.data_registro}, ID da Especialidade: {self.id_especialidade}'
