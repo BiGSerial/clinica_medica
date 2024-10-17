@@ -6,10 +6,10 @@ Este é um projeto disciplinar desenvolvido para a matéria de **Banco de Dados*
 
 O projeto foi desenvolvido pelos seguintes alunos:
 
-- **EVE**
+- **Eve Chalabi**
 - **Wilton Oliveira**
 - **Yasmin Neumann**
-- **Yasmin Souza**
+- **Yasmin Sousa**
 
 ## Descrição do Projeto
 
