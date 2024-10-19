@@ -36,6 +36,8 @@ class ConsultaController:
         
         except Exception as e:
             print(f"Erro ao criar consulta: {e}")
+            if self.db.connection:
+                self.db.connection.rollback()
         
         finally:
             self.db.disconnect()
@@ -60,6 +62,7 @@ class ConsultaController:
                 )
             else:
                 print("Consulta não encontrada.")
+
         
         except Exception as e:
             print(f"Erro ao buscar consulta: {e}")

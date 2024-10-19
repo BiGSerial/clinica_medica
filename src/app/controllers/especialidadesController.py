@@ -4,7 +4,7 @@ sys.path.append('.')
 from src.database.Database import DatabaseConnection
 from src.app.models.especialidades import Especialidades
 
-class EspecialidadeController:
+class EspecialidadesController:
     def __init__(self):
         self.db = DatabaseConnection()
 
@@ -21,12 +21,17 @@ class EspecialidadeController:
                 'nome_especialidade': especialidade.getNomeEspecialidade()
             })
             
+
+            especialidade.setIdEspecialidade(cursor.lastrowid)
+            
             if self.db.connection:
                 self.db.connection.commit()
                 print("Especialidade criada com sucesso.")
         
         except Exception as e:
             print(f"Erro ao criar especialidade: {e}")
+            if self.db.connection:
+                self.db.connection.rollback()
         
         finally:
             self.db.disconnect()
@@ -42,14 +47,14 @@ class EspecialidadeController:
             
             if especialidade:
                 return Especialidades(
-                    id_especialidade=especialidade[0],
-                    nome_especialidade=especialidade[1]
+                    nome_especialidade=especialidade[0]
                 )
             else:
                 print("Especialidade não encontrada.")
         
         except Exception as e:
             print(f"Erro ao buscar especialidade: {e}")
+            return None
         
         finally:
             self.db.disconnect()
@@ -74,6 +79,8 @@ class EspecialidadeController:
         
         except Exception as e:
             print(f"Erro ao atualizar especialidade: {e}")
+            if self.db.connection:
+                self.db.connection.rollback()
         
         finally:
             self.db.disconnect()
@@ -92,6 +99,8 @@ class EspecialidadeController:
         
         except Exception as e:
             print(f"Erro ao deletar especialidade: {e}")
+            if self.db.connection:
+                self.db.connection.rollback()
         
         finally:
             self.db.disconnect()

@@ -1,5 +1,8 @@
 # src/tests/Test_DatabaseCRUD.py
-import unittest
+import unittest, sys
+sys.path.append('.')
+
+
 from src.database.Database import DatabaseConnection
 import cx_Oracle
 

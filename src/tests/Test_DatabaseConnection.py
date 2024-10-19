@@ -1,4 +1,7 @@
 # src/tests/Test_DatabaseConnection.py
+import sys
+sys.path.append('.')
+
 import unittest
 from src.database.Database import DatabaseConnection
 import cx_Oracle
