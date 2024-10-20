@@ -3,6 +3,7 @@ sys.path.append('.')
 
 from src.database.Database import DatabaseConnection
 from src.app.models.especialidades import Especialidades
+import cx_Oracle
 
 class EspecialidadesController:
     def __init__(self):
@@ -13,17 +14,18 @@ class EspecialidadesController:
             self.db.connect()
             cursor = self.db.get_cursor()
 
-            sql = '''INSERT INTO especialidades (id_especialidade, nome_especialidade)
-                     VALUES (:id_especialidade, :nome_especialidade)'''
+            sql = '''INSERT INTO especialidades (nome_especialidade)
+                     VALUES (:nome_especialidade)
+                     RETURNING id_especialidade INTO :id_especialidade'''
             
+            id_especialidade_var = cursor.var(int)  # Variável para capturar o ID gerado
             cursor.execute(sql, {
-                'id_especialidade': especialidade.getIdEspecialidade(),
-                'nome_especialidade': especialidade.getNomeEspecialidade()
+                'nome_especialidade': especialidade.getNomeEspecialidade(),
+                'id_especialidade': id_especialidade_var
             })
-            
 
-            especialidade.setIdEspecialidade(cursor.lastrowid)
-            
+            especialidade.setIdEspecialidade(id_especialidade_var.getvalue()[0])  # Define o ID gerado
+
             if self.db.connection:
                 self.db.connection.commit()
                 print("Especialidade criada com sucesso.")
@@ -47,14 +49,15 @@ class EspecialidadesController:
             
             if especialidade:
                 return Especialidades(
-                    nome_especialidade=especialidade[0]
+                    nome_especialidade=especialidade[1],
+                    id_especialidade=especialidade[0]
                 )
             else:
                 print("Especialidade não encontrada.")
+                return None
         
         except Exception as e:
             print(f"Erro ao buscar especialidade: {e}")
-            return None
         
         finally:
             self.db.disconnect()
@@ -84,6 +87,34 @@ class EspecialidadesController:
         
         finally:
             self.db.disconnect()
+
+    def listar_todas_especialidades(self):
+        """
+        Retorna uma lista com todas as especialidades cadastradas no banco de dados.
+        """
+        try:
+            self.db.connect()
+            cursor = self.db.get_cursor()
+
+            sql = "SELECT * FROM especialidades"
+            cursor.execute(sql)
+            especialidades = cursor.fetchall()
+
+            lista_especialidades = []
+            for esp in especialidades:
+                especialidade = Especialidades(esp[1])
+                especialidade.setIdEspecialidade(esp[0])
+                lista_especialidades.append(especialidade)
+
+            return lista_especialidades
+        
+        except Exception as e:
+            print(f"Erro ao listar especialidades: {e}")
+            return []
+        
+        finally:
+            self.db.disconnect()
+            
 
     def deletar_especialidade(self, id_especialidade):
         try:

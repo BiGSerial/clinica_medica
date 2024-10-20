@@ -1,10 +1,6 @@
-# src/app/models/paciente.pyds
 class Paciente:
-
-    id_paciente:int = 0
-
-    def __init__(self, nome, cpf, sexo, data_nascimento, telefone, email, cep):        
-        
+    def __init__(self, nome, cpf, sexo, data_nascimento, telefone, email, cep, id_paciente=None):
+        self.id_paciente = id_paciente
         self.setNome(nome)
         self.setCpf(cpf)
         self.setSexo(sexo)
@@ -12,7 +8,6 @@ class Paciente:
         self.setTelefone(telefone)
         self.setEmail(email)
         self.setCep(cep)
-             
 
     def setIdPaciente(self, id_paciente):
         self.id_paciente = id_paciente
@@ -61,7 +56,6 @@ class Paciente:
     
     def getCep(self):
         return self.cep
-    
 
     def toString(self):
         return f'ID: {self.id_paciente}, Nome: {self.nome}, CPF: {self.cpf}, Sexo: {self.sexo}, Data de Nascimento: {self.data_nascimento}, Telefone: {self.telefone}, Email: {self.email}, CEP: {self.cep}'

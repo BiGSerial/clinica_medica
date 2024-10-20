@@ -1,10 +1,6 @@
-#src/app/models/consulta.py
 class Consulta:
-
-    id_consulta = 0
-
-    def __init__(self, horario_consulta_realizada, relatorios, data_criacao, id_paciente, id_medico, status):
-        
+    def __init__(self, horario_consulta_realizada, relatorios, data_criacao, id_paciente, id_medico, status, id_consulta=None):
+        self.id_consulta = id_consulta
         self.setHorarioConsultaRealizada(horario_consulta_realizada)
         self.setRelatorios(relatorios)
         self.setDataCriacao(data_criacao)
@@ -13,48 +9,46 @@ class Consulta:
         self.setStatus(status)
 
     def getIdConsulta(self):
-        return self._id_consulta
+        return self.id_consulta
 
     def setIdConsulta(self, id_consulta):
-        self._id_consulta = id_consulta
+        self.id_consulta = id_consulta
 
     def getHorarioConsultaRealizada(self):
-        return self._horario_consulta_realizada
+        return self.horario_consulta_realizada
 
     def setHorarioConsultaRealizada(self, horario_consulta_realizada):
-        self._horario_consulta_realizada = horario_consulta_realizada
+        self.horario_consulta_realizada = horario_consulta_realizada
 
     def getRelatorios(self):
-        return self._relatorios
+        return self.relatorios
 
     def setRelatorios(self, relatorios):
-        self._relatorios = relatorios
+        self.relatorios = relatorios
 
     def getDataCriacao(self):
-        return self._data_criacao
+        return self.data_criacao
 
     def setDataCriacao(self, data_criacao):
-        self._data_criacao = data_criacao
+        self.data_criacao = data_criacao
 
     def getIdPaciente(self):
-        return self._id_paciente
+        return self.id_paciente
 
     def setIdPaciente(self, id_paciente):
-        self._id_paciente = id_paciente
+        self.id_paciente = id_paciente
 
     def getIdMedico(self):
-        return self._id_medico
+        return self.id_medico
 
     def setIdMedico(self, id_medico):
-        self._id_medico = id_medico
+        self.id_medico = id_medico
 
     def getStatus(self):
-        return self._status
+        return self.status
 
     def setStatus(self, status):
-        self._status = status
+        self.status = status
 
     def toString(self):
-        return f'ID Consulta: {self._id_consulta}, Horário da Consulta Realizada: {self._horario_consulta_realizada}, Relatórios: {self._relatorios}, Data de Criação: {self._data_criacao}, ID Paciente: {self._id_paciente}, ID Médico: {self._id_medico}, Status: {self._status}'
-
-      
+        return f'ID Consulta: {self.id_consulta}, Horário da Consulta: {self.horario_consulta_realizada}, Relatórios: {self.relatorios}, Data de Criação: {self.data_criacao}, ID Paciente: {self.id_paciente}, ID Médico: {self.id_medico}, Status: {self.status}'

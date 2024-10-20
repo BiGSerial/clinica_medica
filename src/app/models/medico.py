@@ -1,10 +1,6 @@
-# src/app/models/medico.py
 class Medico:
-    
-    id_medico:int = 0
-
-    def __init__(self, nome, crm, telefone, email, cep, data_nascimento, data_contratacao, data_registro, id_especialidade):
-        self.setIdMedico(self.id_medico)
+    def __init__(self, nome, crm, telefone, email, cep, data_nascimento, data_contratacao, data_registro, id_especialidade, id_medico=None):
+        self.id_medico = id_medico
         self.setNome(nome)
         self.setCrm(crm)
         self.setTelefone(telefone)

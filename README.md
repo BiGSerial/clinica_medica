@@ -39,6 +39,8 @@ As tabelas principais incluem:
 
 O arquivo `setup.sql` contém os comandos SQL para criação das tabelas necessárias para o sistema. Certifique-se de rodá-lo no banco de dados Oracle antes de utilizar o sistema.
 
+Também é possível executar o script em `src/app/setup_database.py`caso esteja configurado no `.env`.
+
 ## Tecnologias Utilizadas
 
 - **Python**: Linguagem principal para o backend.

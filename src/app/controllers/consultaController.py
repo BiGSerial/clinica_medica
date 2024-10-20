@@ -1,9 +1,9 @@
-# src/app/controllers/consultaController.py
 import sys
 sys.path.append('.')
 
 from src.database.Database import DatabaseConnection
 from src.app.models.consulta import Consulta
+import cx_Oracle
 
 class ConsultaController:
     def __init__(self):
@@ -16,20 +16,22 @@ class ConsultaController:
 
             sql = '''INSERT INTO consultas 
                      (horario_consulta_realizada, relatorios, status, data_criacao, id_paciente, id_medico) 
-                     VALUES (:horario_consulta_realizada, :relatorios, :status, :data_criacao, :id_paciente, :id_medico)'''
+                     VALUES (:horario_consulta_realizada, :relatorios, :status, :data_criacao, :id_paciente, :id_medico)
+                     RETURNING id_consulta INTO :id_consulta'''
             
+            id_consulta_var = cursor.var(int)  # Variável para capturar o ID gerado
             cursor.execute(sql, {
                 'horario_consulta_realizada': consulta.getHorarioConsultaRealizada(),
                 'relatorios': consulta.getRelatorios(),
                 'status': consulta.getStatus(),
                 'data_criacao': consulta.getDataCriacao(),
                 'id_paciente': consulta.getIdPaciente(),
-                'id_medico': consulta.getIdMedico()
+                'id_medico': consulta.getIdMedico(),
+                'id_consulta': id_consulta_var
             })
 
-            #Pega o id da consulta criada
-            consulta.setIdConsulta(cursor.lastrowid)
-            
+            consulta.setIdConsulta(id_consulta_var.getvalue()[0])  # Define o ID gerado na consulta
+
             if self.db.connection:
                 self.db.connection.commit()
                 print("Consulta criada com sucesso.")
@@ -58,12 +60,13 @@ class ConsultaController:
                     status=consulta[3],
                     data_criacao=consulta[4],
                     id_paciente=consulta[5],
-                    id_medico=consulta[6]
+                    id_medico=consulta[6],
+                    id_consulta=consulta[0]
                 )
             else:
                 print("Consulta não encontrada.")
+                return None
 
-        
         except Exception as e:
             print(f"Erro ao buscar consulta: {e}")
         
@@ -85,21 +88,23 @@ class ConsultaController:
                      WHERE id_consulta = :id_consulta'''
             
             cursor.execute(sql, {
-                'id_consulta': consulta.getIdConsulta(),
                 'horario_consulta_realizada': consulta.getHorarioConsultaRealizada(),
                 'relatorios': consulta.getRelatorios(),
                 'status': consulta.getStatus(),
                 'data_criacao': consulta.getDataCriacao(),
                 'id_paciente': consulta.getIdPaciente(),
-                'id_medico': consulta.getIdMedico()
+                'id_medico': consulta.getIdMedico(),
+                'id_consulta': consulta.getIdConsulta()
             })
             
             if self.db.connection:
                 self.db.connection.commit()
-            print("Consulta atualizada com sucesso.")
+                print("Consulta atualizada com sucesso.")
         
         except Exception as e:
             print(f"Erro ao atualizar consulta: {e}")
+            if self.db.connection:
+                self.db.connection.rollback()
         
         finally:
             self.db.disconnect()
@@ -118,6 +123,8 @@ class ConsultaController:
         
         except Exception as e:
             print(f"Erro ao deletar consulta: {e}")
+            if self.db.connection:
+                self.db.connection.rollback()
         
         finally:
             self.db.disconnect()
