@@ -4,7 +4,7 @@ from src.app.controllers.pacienteController import PacienteController
 from src.app.models.paciente import Paciente
 from src.app.views.appTitle import AppTitle, SplashScreen
 from src.app.views.utils import refresh
-from src.app.views.validations import validar_inteiro, validar_data, validar_email  # Importando funções de validação
+from src.app.views.validations import validar_inteiro, validar_data, validar_email, validar_texto  # Importando funções de validação
 
 class PacienteView:
     def __init__(self):
@@ -43,34 +43,22 @@ class PacienteView:
         AppTitle.display_title()
         nome = input("Digite o nome do paciente: ")
 
-        cpf = validar_inteiro(input("Digite o CPF (somente números): "), "CPF")
-        if cpf is None: return
+        cpf = validar_texto("CPF", 11)
+        sexo = validar_texto("Sexo (M/F)", 1, 1)
+        email = validar_email("Digite o novo email: ")
+        cep = validar_texto("CEP", 8, 8)
+        data_nascimento = validar_data("Digite a nova data de nascimento (DD/MM/AAAA): ")
+        telefone = validar_texto("Telefone", 9, 11)
 
-        sexo = input("Digite o sexo (M/F): ").upper()
-        if sexo not in ['M', 'F']:
-            print("Sexo inválido. Insira 'M' para masculino ou 'F' para feminino.")
-            return
 
-        email = validar_email(input("Digite o email: "))
-        if email is None: return
-
-        cep = validar_inteiro(input("Digite o CEP (somente números): "), "CEP")
-        if cep is None: return
-
-        data_nascimento = validar_data(input("Digite a data de nascimento (DD/MM/AAAA): "))
-        if data_nascimento is None: return
-
-        telefone = validar_inteiro(input("Digite o telefone (somente números): "), "Telefone")
-        if telefone is None: return
-
-        paciente = Paciente(nome, cpf, sexo, data_nascimento, telefone ,email, cep)
+        paciente = Paciente(nome, cpf, sexo, data_nascimento, telefone, email, cep)
         self.controller.criar_paciente(paciente)
         input("\nPressione ENTER para voltar ao menu...")
 
     def buscar_paciente(self):
         refresh()
         AppTitle.display_title()
-        id_paciente = validar_inteiro(input("Digite o ID do paciente: "), "ID do Paciente")
+        id_paciente = validar_inteiro("ID do Paciente")
         if id_paciente is None: return
 
         paciente = self.controller.buscar_paciente(id_paciente)
@@ -81,43 +69,30 @@ class PacienteView:
     def atualizar_paciente(self):
         refresh()
         AppTitle.display_title()
-        id_paciente = validar_inteiro(input("Digite o ID do paciente que deseja atualizar: "), "ID do Paciente")
+        id_paciente = validar_inteiro("ID do Paciente que deseja atualizar")
         if id_paciente is None: return
 
         paciente_existente = self.controller.buscar_paciente(id_paciente)
         if paciente_existente:
             nome = input("Digite o novo nome: ")
 
-            cpf = validar_inteiro(input("Digite o novo CPF (somente números): "), "CPF")
-            if cpf is None: return
+            cpf = validar_texto("CPF", 11)
+            sexo = validar_texto("Sexo (M/F)", 1, 1)
+            email = validar_email("Digite o novo email: ")
+            cep = validar_texto("CEP", 8, 8)
+            data_nascimento = validar_data("Digite a nova data de nascimento (DD/MM/AAAA): ")
+            telefone = validar_texto("Telefone", 9, 11)
 
-            sexo = input("Digite o novo sexo (M/F): ").upper()
-            if sexo not in ['M', 'F']:
-                print("Sexo inválido. Insira 'M' para masculino ou 'F' para feminino.")
-                return
-
-            email = validar_email(input("Digite o novo email: "))
-            if email is None: return
-
-            cep = validar_inteiro(input("Digite o novo CEP (somente números): "), "CEP")
-            if cep is None: return
-
-            data_nascimento = validar_data(input("Digite a nova data de nascimento (DD/MM/AAAA): "))
-            if data_nascimento is None: return
-
-            telefone = validar_inteiro(input("Digite o novo telefone (somente números): "), "Telefone")
-            if telefone is None: return
-
-                                                   
-            paciente_atualizado = Paciente(nome, cpf, sexo, data_nascimento, telefone ,email, cep)
+            paciente_atualizado = Paciente(nome, cpf, sexo, data_nascimento, telefone, email, cep)
             paciente_atualizado.setIdPaciente(id_paciente)
             self.controller.atualizar_paciente(paciente_atualizado)
+
         input("\nPressione ENTER para voltar ao menu...")
 
     def deletar_paciente(self):
         refresh()
         AppTitle.display_title()
-        id_paciente = validar_inteiro(input("Digite o ID do paciente a ser deletado: "), "ID do Paciente")
+        id_paciente = validar_inteiro("ID do Paciente a ser deletado")
         if id_paciente is None: return
 
         self.controller.deletar_paciente(id_paciente)

@@ -1,10 +1,11 @@
+from pydoc import doc
 import sys
 sys.path.append('.')
 from src.app.controllers.medicoController import MedicoController
 from src.app.models.medico import Medico
 from src.app.views.appTitle import AppTitle, SplashScreen
 from src.app.views.utils import refresh
-from src.app.views.validations import validar_inteiro, validar_data, validar_email
+from src.app.views.validations import validar_inteiro, validar_data, validar_email, validar_texto
 
 class MedicoView:
     def __init__(self):
@@ -55,30 +56,26 @@ class MedicoView:
         refresh()
         AppTitle.display_title()
         nome = input("Digite o nome do médico: ")
-        
-        crm = validar_inteiro(input("Digite o CRM (somente números): "), "CRM", 9)
-        if crm is None: return
 
-        telefone = validar_inteiro(input("Digite o telefone (somente números): "), "Telefone", 11)
-        if telefone is None: return
+        crm = validar_texto("CRM", 9)
+        telefone = validar_texto("Telefone", 11)
+        email = validar_email("Digite o email: ")
+        cep = validar_texto("CEP", 8)
+        data_nascimento = validar_data("Digite a data de nascimento (DD/MM/AAAA): ")
+        data_contratacao = validar_data("Digite a data de contratação (DD/MM/AAAA): ")
+        data_registro = validar_data("Digite a data de registro (DD/MM/AAAA): ")
+        id_especialidade = validar_inteiro("ID da Especialidade")
 
-        email = validar_email(input("Digite o email: "))
-        if email is None: return
-
-        cep = validar_inteiro(input("Digite o CEP (somente números): "), "CEP", 8)
-        if cep is None: return
-
-        data_nascimento = validar_data(input("Digite a data de nascimento (DD/MM/AAAA): "))
-        if data_nascimento is None: return
-
-        data_contratacao = validar_data(input("Digite a data de contratação (DD/MM/AAAA): "))
-        if data_contratacao is None: return
-
-        data_registro = validar_data(input("Digite a data de registro (DD/MM/AAAA): "))
-        if data_registro is None: return
-
-        id_especialidade = validar_inteiro(input("Digite o ID da especialidade: "), "ID da Especialidade")
-        if id_especialidade is None: return
+        # Debugging: Dump the variables to see their contents
+        print(f"Nome: {nome}")
+        print(f"CRM: {crm}")
+        print(f"Telefone: {telefone}")
+        print(f"Email: {email}")
+        print(f"CEP: {cep}")
+        print(f"Data de Nascimento: {data_nascimento}")
+        print(f"Data de Contratação: {data_contratacao}")
+        print(f"Data de Registro: {data_registro}")
+        print(f"ID da Especialidade: {id_especialidade}")
 
         medico = Medico(nome, crm, telefone, email, cep, data_nascimento, data_contratacao, data_registro, id_especialidade)
         self.controller.criar_medico(medico)
@@ -123,41 +120,28 @@ class MedicoView:
         # Exibe todos os médicos com ID, CRM, nome e especialidade
         self.listar_todos_medicos()
 
-        id_medico = validar_inteiro(input("Digite o ID do médico que deseja atualizar: "), "ID do Médico")
-        if id_medico is None: return
+        id_medico = validar_inteiro("ID do médico que deseja atualizar")
+       
 
         medico_existente = self.controller.buscar_medico(id_medico)
         if medico_existente:
             nome = input("Digite o novo nome: ")
 
-            crm = validar_inteiro(input("Digite o novo CRM (somente números): "), "CRM", 9)
-            if crm is None: return
-
-            telefone = validar_inteiro(input("Digite o novo telefone (somente números): "), "Telefone", 11)
-            if telefone is None: return
-
-            email = validar_email(input("Digite o novo email: "))
-            if email is None: return
-
-            cep = validar_inteiro(input("Digite o novo CEP (somente números): "), "CEP", 8)
-            if cep is None: return
-
-            data_nascimento = validar_data(input("Digite a nova data de nascimento (DD/MM/AAAA): "))
-            if data_nascimento is None: return
-
-            data_contratacao = validar_data(input("Digite a nova data de contratação (DD/MM/AAAA): "))
-            if data_contratacao is None: return
-
-            data_registro = validar_data(input("Digite a nova data de registro (DD/MM/AAAA): "))
-            if data_registro is None: return
-
-            id_especialidade = validar_inteiro(input("Digite o novo ID da especialidade: "), "ID da Especialidade")
-            if id_especialidade is None: return
+            crm = validar_texto("CRM", 9)
+            telefone = validar_texto("Telefone", 11)
+            email = validar_email("Digite o novo email: ")
+            cep = validar_texto("CEP", 8)
+            data_nascimento = validar_data("Digite a nova data de nascimento (DD/MM/AAAA): ")
+            data_contratacao = validar_data("Digite a nova data de contratação (DD/MM/AAAA): ")
+            data_registro = validar_data("Digite a nova data de registro (DD/MM/AAAA): ")
+            id_especialidade = validar_inteiro("ID da Especialidade")
 
             medico_atualizado = Medico(nome, crm, telefone, email, cep, data_nascimento, data_contratacao, data_registro, id_especialidade)
             medico_atualizado.setIdMedico(id_medico)
             self.controller.atualizar_medico(medico_atualizado)
+
         input("\nPressione ENTER para voltar ao menu...")
+
 
     def deletar_medico(self):
         refresh()
