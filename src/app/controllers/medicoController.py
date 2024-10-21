@@ -73,7 +73,7 @@ class MedicoController:
         finally:
             self.db.disconnect()
 
-    def buscar_medico(self, id_medico):
+    def buscar_medico(self, id_medico:int):
         """
         Busca um médico por ID.
         """
