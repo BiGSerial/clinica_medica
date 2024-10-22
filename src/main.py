@@ -20,7 +20,7 @@ class MainMenu:
         while True:
             refresh()  # Limpa a tela
             AppTitle.display_title()  # Exibe o título do aplicativo
-            print("\n--- Menu Principal ---")
+            print("\n---- Menu Principal ----")
             print("1. Gerenciar Consultas")
             print("2. Gerenciar Médicos")
             print("3. Gerenciar Pacientes")
