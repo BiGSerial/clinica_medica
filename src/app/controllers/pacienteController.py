@@ -113,6 +113,31 @@ class PacienteController:
         finally:
             self.db.disconnect()
 
+
+    def listar_todos_pacientes(self):
+        """
+        Retorna uma lista com todos os pacientes.
+        """
+        try:
+            self.db.connect()
+            cursor = self.db.get_cursor()
+
+            sql = """
+                SELECT p.id_paciente, p.nome, p.cpf, p.sexo, p.email, p.cep, p.data_nascimento, p.telefone 
+                FROM pacientes p
+            """
+            cursor.execute(sql)
+            pacientes = cursor.fetchall()
+
+            return pacientes
+        
+        except Exception as e:
+            print(f"Erro ao listar pacientes: {e}")
+            return []
+        
+        finally:
+            self.db.disconnect()
+
     def deletar_paciente(self, id_paciente):
         try:
             self.db.connect()

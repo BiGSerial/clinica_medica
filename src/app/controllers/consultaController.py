@@ -109,6 +109,33 @@ class ConsultaController:
         finally:
             self.db.disconnect()
 
+    def listar_todas_consultas(self):
+        """
+        Retorna uma lista com todos as consultas.
+        """
+        try:
+            self.db.connect()
+            cursor = self.db.get_cursor()
+
+            sql = """
+                SELECT c.id_consulta, c.data_criacao, c.horario_consulta_realizada, c.status, p.nome AS nome_paciente, m.nome AS nome_medico, e.nome_especialidade
+                FROM consultas c                
+                JOIN medicos m ON c.id_medico = m.id_medico
+                JOIN pacientes p ON c.id_paciente = p.id_paciente
+                JOIN especialidades e ON m.id_especialidade = e.id_especialidade
+            """
+            cursor.execute(sql)
+            consulta = cursor.fetchall()
+
+            return consulta
+        
+        except Exception as e:
+            print(f"Erro ao listar consultas: {e}")
+            return []
+        
+        finally:
+            self.db.disconnect()
+
     def deletar_consulta(self, id_consulta):
         try:
             self.db.connect()

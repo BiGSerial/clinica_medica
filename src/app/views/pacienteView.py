@@ -18,6 +18,7 @@ class PacienteView:
             print("2. Buscar Paciente")
             print("3. Atualizar Paciente")
             print("4. Deletar Paciente")
+            print("5. Listar Todos os Pacientes")
             print("9. Retornar")
             print("0. Sair")
 
@@ -92,7 +93,15 @@ class PacienteView:
     def deletar_paciente(self):
         refresh()
         AppTitle.display_title()
-        id_paciente = validar_inteiro("ID do Paciente a ser deletado")
+        print('')
+        pacientes = self.controller.listar_todos_pacientes()
+        if pacientes:
+            for paciente in pacientes:
+               print(f"ID: {paciente[0]}, Nome: {paciente[1]}, CPF: {paciente[2]}, SEXO: {paciente[3]}")
+
+        print('')
+        id_paciente = validar_inteiro("ID do Paciente a ser deletado")       
+
         if id_paciente is None: return
 
         self.controller.deletar_paciente(id_paciente)

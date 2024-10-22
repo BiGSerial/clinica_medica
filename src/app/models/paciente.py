@@ -2,6 +2,8 @@ from datetime import date
 class Paciente:
     from typing import Optional
 
+    id_paciente = 0
+
     def __init__(self, nome:str, cpf:str, sexo:str, data_nascimento:date, telefone:str, email:str, cep:str, id_paciente:Optional[int]=None):
         self.id_paciente = id_paciente
         self.setNome(nome)
