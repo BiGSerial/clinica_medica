@@ -1,137 +1,122 @@
-import sys
-sys.path.append('.')
-
-from src.database.Database import DatabaseConnection
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 from src.app.models.especialidades import Especialidades
-import cx_Oracle
 
 class EspecialidadesController:
     def __init__(self):
-        self.db = DatabaseConnection()
+        self.client = MongoClient('mongodb://localhost:27017/')
+        self.db = self.client['clinicadb']
+        self.collection = self.db['especialidades']
 
     def criar_especialidade(self, especialidade: Especialidades):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
+            # Busca o último documento para determinar o maior ID existente
+            cursor = self.collection.find().sort("id_especialidade", -1).limit(1)
+            last_especialidade = next(cursor, None)
+            new_id = (last_especialidade['id_especialidade'] + 1) if last_especialidade else 1
 
-            sql = '''INSERT INTO especialidades (nome_especialidade)
-                     VALUES (:nome_especialidade)
-                     RETURNING id_especialidade INTO :id_especialidade'''
+            # Criação do dicionário para inserção no MongoDB
+            especialidade_dict = {
+                'id_especialidade': new_id,
+                'nome_especialidade': especialidade.getNomeEspecialidade()
+            }
             
-            id_especialidade_var = cursor.var(int)  # Variável para capturar o ID gerado
-            cursor.execute(sql, {
-                'nome_especialidade': especialidade.getNomeEspecialidade(),
-                'id_especialidade': id_especialidade_var
-            })
+            # Inserção no MongoDB
+            self.collection.insert_one(especialidade_dict)
 
-            especialidade.setIdEspecialidade(id_especialidade_var.getvalue()[0])  # Define o ID gerado
-
-            if self.db.connection:
-                self.db.connection.commit()
-                print("Especialidade criada com sucesso.")
+            # Atualiza o ID no objeto da classe Especialidades
+            especialidade.setIdEspecialidade(new_id)
+            print("Especialidade criada com sucesso.")
         
         except Exception as e:
             print(f"Erro ao criar especialidade: {e}")
-            if self.db.connection:
-                self.db.connection.rollback()
-        
-        finally:
-            self.db.disconnect()
 
     def buscar_especialidade(self, id_especialidade):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
+            # Certifique-se de que id_especialidade é do tipo inteiro
+            id_especialidade = int(id_especialidade)
+            # print(f"Buscando especialidade com id_especialidade: {id_especialidade}")
             
-            sql = "SELECT * FROM especialidades WHERE id_especialidade = :id_especialidade"
-            cursor.execute(sql, {'id_especialidade': id_especialidade})
-            especialidade = cursor.fetchone()
+            # Busca especialidade pelo ID
+            especialidade = self.collection.find_one({'id_especialidade': id_especialidade})
             
             if especialidade:
+              
+                # Retorna um objeto Especialidades com os dados encontrados
                 return Especialidades(
-                    nome_especialidade=especialidade[1],
-                    id_especialidade=especialidade[0]
+                    nome_especialidade=especialidade['nome_especialidade'],
+                    id_especialidade=especialidade['id_especialidade']
                 )
             else:
                 print("Especialidade não encontrada.")
                 return None
-        
+            
         except Exception as e:
             print(f"Erro ao buscar especialidade: {e}")
-        
-        finally:
-            self.db.disconnect()
+            return None
+
 
     def atualizar_especialidade(self, especialidade: Especialidades):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-
-            sql = '''UPDATE especialidades SET 
-                     nome_especialidade = :nome_especialidade
-                     WHERE id_especialidade = :id_especialidade'''
+            # Certifique-se de que o ID seja do tipo inteiro
+            id_especialidade = int(especialidade.getIdEspecialidade())
+            print(f"Atualizando especialidade com id_especialidade: {id_especialidade}")
             
-            cursor.execute(sql, {
-                'nome_especialidade': especialidade.getNomeEspecialidade(),
-                'id_especialidade': especialidade.getIdEspecialidade()
-            })
+            # Atualiza o documento com base no ID
+            result = self.collection.update_one(
+                {'id_especialidade': id_especialidade},
+                {'$set': {'nome_especialidade': especialidade.getNomeEspecialidade()}}
+            )
             
-            if self.db.connection:
-                self.db.connection.commit()
+            # Verifica se houve uma modificação
+            if result.modified_count > 0:
                 print("Especialidade atualizada com sucesso.")
+            else:
+                print("Nenhuma especialidade foi atualizada. Verifique se o ID existe.")
         
         except Exception as e:
             print(f"Erro ao atualizar especialidade: {e}")
-            if self.db.connection:
-                self.db.connection.rollback()
-        
-        finally:
-            self.db.disconnect()
+
 
     def listar_todas_especialidades(self):
         """
         Retorna uma lista com todas as especialidades cadastradas no banco de dados.
         """
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-
-            sql = "SELECT * FROM especialidades"
-            cursor.execute(sql)
-            especialidades = cursor.fetchall()
-
+            # Obtém todos os documentos da coleção
+            especialidades = self.collection.find()
             lista_especialidades = []
+            
+            # Itera sobre os documentos retornados e cria objetos Especialidades
             for esp in especialidades:
-                especialidade = Especialidades(esp[1])
-                especialidade.setIdEspecialidade(esp[0])
+                especialidade = Especialidades(
+                    nome_especialidade=esp['nome_especialidade'],
+                    id_especialidade=esp['id_especialidade']
+                )
                 lista_especialidades.append(especialidade)
-
+            
+            # Retorna a lista de especialidades
             return lista_especialidades
         
         except Exception as e:
             print(f"Erro ao listar especialidades: {e}")
             return []
-        
-        finally:
-            self.db.disconnect()
-            
+
 
     def deletar_especialidade(self, id_especialidade):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-
-            sql = "DELETE FROM especialidades WHERE id_especialidade = :id_especialidade"
-            cursor.execute(sql, {'id_especialidade': id_especialidade})
+            # Certifique-se de que o ID seja do tipo inteiro
+            id_especialidade = int(id_especialidade)
+            print(f"Deletando especialidade com id_especialidade: {id_especialidade}")
             
-            if self.db.connection:
-                self.db.connection.commit()
+            # Remove o documento com o ID correspondente
+            result = self.collection.delete_one({'id_especialidade': id_especialidade})
+            
+            # Verifica se algum documento foi deletado
+            if result.deleted_count > 0:
                 print("Especialidade deletada com sucesso.")
+            else:
+                print("Nenhuma especialidade foi deletada. Verifique se o ID existe.")
         
         except Exception as e:
             print(f"Erro ao deletar especialidade: {e}")
-            if self.db.connection:
-                self.db.connection.rollback()
-        
-        finally:
-            self.db.disconnect()

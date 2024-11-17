@@ -14,7 +14,7 @@ O projeto foi desenvolvido pelos seguintes alunos:
 
 ## Descrição do Projeto
 
-O sistema foi implementado em **Python**, sem o uso de um ORM (Object-Relational Mapping). Toda a interação com o banco de dados é feita utilizando **SQL puro** e o driver **cx_Oracle** para conexão com o banco de dados Oracle.
+O sistema foi implementado em **Python**, utilizando o banco de dados **MongoDB** para armazenamento de informações. Todas as operações de banco de dados são realizadas utilizando a biblioteca **PyMongo**.
 
 ### Funcionalidades Principais
 
@@ -23,29 +23,26 @@ O sistema foi implementado em **Python**, sem o uso de um ORM (Object-Relational
 - **Agendamento de Consultas**: Registro e controle de consultas médicas.
 - **Relatórios**: Geração de relatórios básicos sobre consultas realizadas e pacientes cadastrados.
 
-
 ### Banco de Dados
 
-O banco de dados utilizado para este projeto é o **Oracle**. As operações são realizadas usando **SQL direto**, sem intermediários como ORMs.
+O banco de dados utilizado para este projeto é o **MongoDB**, um banco de dados NoSQL orientado a documentos.
 
-As tabelas principais incluem:
+As coleções principais incluem:
 
-- **PACIENTES**: Informações pessoais, CPF, data de nascimento, etc.
-- **MEDICOS**: Cadastro de médicos, CRM, especialidade, etc.
-- **ESPECIALIDADES**: Lista de especialidades médicas.
-- **CONSULTAS**: Agendamento e controle de consultas.
+- **pacientes**: Informações pessoais, CPF, data de nascimento, etc.
+- **medicos**: Cadastro de médicos, CRM, especialidade, etc.
+- **especialidades**: Lista de especialidades médicas.
+- **consultas**: Agendamento e controle de consultas.
 
-### Scripts SQL
+### Scripts de Configuração
 
-O arquivo `setup.sql` contém os comandos SQL para criação das tabelas necessárias para o sistema. Certifique-se de rodá-lo no banco de dados Oracle antes de utilizar o sistema.
-
-Também é possível executar o script em `src/app/setup_database.py`caso esteja configurado no `.env`.
+O arquivo `setup_database.py` na pasta `src/app/` contém a configuração inicial das coleções no MongoDB, incluindo a inserção de dados de exemplo.
 
 ## Tecnologias Utilizadas
 
 - **Python**: Linguagem principal para o backend.
-- **cx_Oracle**: Driver para conectar o Python ao banco de dados Oracle.
-- **Oracle XE**: Sistema de gerenciamento de banco de dados utilizado para armazenar os dados da clínica.
+- **PyMongo**: Driver para conectar o Python ao banco de dados MongoDB.
+- **MongoDB**: Sistema de gerenciamento de banco de dados utilizado para armazenar os dados da clínica.
 
 ## Pré-requisitos
 
@@ -53,21 +50,9 @@ Antes de começar, você precisará ter instalado:
 
 - [Python 3.x](https://www.python.org/downloads/)
 - [pip](https://pip.pypa.io/en/stable/)
-- [Oracle XE](https://www.oracle.com/database/technologies/xe-downloads.html)
+- [MongoDB](https://www.mongodb.com/try/download/community)
 - [Git](https://git-scm.com/)
 
-## Configuração do Ambiente
-
-O sistema utiliza um arquivo `.env` para configurar as credenciais de acesso ao banco de dados. Você deve criar um arquivo `.env` na raiz do projeto com o seguinte formato:
-
-### Exemplo de `.env`
-
-```bash
-DB_USER=seu_usuario
-DB_PASSWORD=sua_senha
-DB_HOST=localhost
-DB_PORT=1521
-DB_SERVICE=XE
 
 
 

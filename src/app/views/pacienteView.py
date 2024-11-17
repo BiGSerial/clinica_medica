@@ -32,6 +32,8 @@ class PacienteView:
                 self.atualizar_paciente()
             elif opcao == '4':
                 self.deletar_paciente()
+            elif opcao == '5':
+                self.listar_todos_pacientes()
             elif opcao == '9':
                 return
             elif opcao == '0':
@@ -97,7 +99,7 @@ class PacienteView:
         pacientes = self.controller.listar_todos_pacientes()
         if pacientes:
             for paciente in pacientes:
-               print(f"ID: {paciente[0]}, Nome: {paciente[1]}, CPF: {paciente[2]}, SEXO: {paciente[3]}")
+                print(f"ID: {paciente.getIdPaciente()}, Nome: {paciente.getNome()}, CPF: {paciente.getCpf()}, Sexo: {paciente.getSexo()}, Data de Nascimento: {paciente.getDataNascimento()}, Telefone: {paciente.getTelefone()}, Email: {paciente.getEmail()}, CEP: {paciente.getCep()}")
 
         print('')
         id_paciente = validar_inteiro("ID do Paciente a ser deletado")       
@@ -106,6 +108,23 @@ class PacienteView:
 
         self.controller.deletar_paciente(id_paciente)
         input("\nPressione ENTER para voltar ao menu...")
+
+    def listar_todos_pacientes(self):
+        refresh()
+        AppTitle.display_title()
+        print("\nLista de Todos os Pacientes:\n")
+        
+        # Obtém todos os pacientes do controller
+        pacientes = self.controller.listar_todos_pacientes()
+        
+        if pacientes:
+            for paciente in pacientes:
+                print(f"ID: {paciente.getIdPaciente()}, Nome: {paciente.getNome()}, CPF: {paciente.getCpf()}, Sexo: {paciente.getSexo()}, Data de Nascimento: {paciente.getDataNascimento()}, Telefone: {paciente.getTelefone()}, Email: {paciente.getEmail()}, CEP: {paciente.getCep()}")
+        else:
+            print("Nenhum paciente encontrado.")
+        
+        input("\nPressione ENTER para voltar ao menu...")
+
 
 if __name__ == "__main__":
     view = PacienteView()

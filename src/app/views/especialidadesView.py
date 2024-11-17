@@ -1,6 +1,7 @@
 from re import A
 import sys
 sys.path.append('.')
+
 from src.app.controllers.especialidadesController import EspecialidadesController
 from src.app.models.especialidades import Especialidades
 from src.app.views.appTitle import AppTitle, SplashScreen
@@ -42,7 +43,7 @@ class EspecialidadesView:
         refresh()
         AppTitle.display_title()
         nome_especialidade = input("Digite o nome da especialidade: ")
-        especialidade = Especialidades(nome_especialidade)
+        especialidade = Especialidades(nome_especialidade=nome_especialidade)
         self.controller.criar_especialidade(especialidade)
         input("\nPressione ENTER para voltar ao menu...")
 
@@ -66,6 +67,7 @@ class EspecialidadesView:
             print("\nEspecialidades disponíveis:")
             for esp in especialidades:
                 print(f"ID: {esp.getIdEspecialidade()}, Nome: {esp.getNomeEspecialidade()}")
+
         else:
             print("Nenhuma especialidade encontrada.")
         input("\nPressione ENTER para continuar...")
@@ -82,12 +84,13 @@ class EspecialidadesView:
             for esp in especialidades:
                 print(f"ID: {esp.getIdEspecialidade()}, Nome: {esp.getNomeEspecialidade()}")
 
+
             id_especialidade = input("\nDigite o ID da especialidade que deseja atualizar: ")
             especialidade_existente = self.controller.buscar_especialidade(id_especialidade)
             if especialidade_existente:
                 nome_especialidade = input("Digite o novo nome da especialidade: ")
-                especialidade_atualizada = Especialidades(nome_especialidade)
-                especialidade_atualizada.setIdEspecialidade(id_especialidade)
+                especialidade_atualizada = Especialidades(nome_especialidade=nome_especialidade)
+                especialidade_atualizada.id_especialidade = id_especialidade
                 self.controller.atualizar_especialidade(especialidade_atualizada)
                 print("Especialidade atualizada com sucesso!")
             else:
@@ -105,6 +108,7 @@ class EspecialidadesView:
             print("\nEspecialidades disponíveis para exclusão:")
             for esp in especialidades:
                 print(f"ID: {esp.getIdEspecialidade()}, Nome: {esp.getNomeEspecialidade()}")
+
 
             id_especialidade = input("\nDigite o ID da especialidade a ser deletada: ")
             especialidade_existente = self.controller.buscar_especialidade(id_especialidade)

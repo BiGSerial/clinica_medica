@@ -47,7 +47,7 @@ class MedicoView:
         if medicos:
             print("\nMédicos disponíveis:")
             for medico in medicos:
-                print(f"ID: {medico[0]}, CRM: {medico[1]}, Nome: {medico[2]}, Especialidade: {medico[3]}")
+                print(f"ID: {medico.getIdMedico()}, CRM: {medico.getCrm()}, Nome: {medico.getNome()}, Especialidade: {medico.getIdEspecialidade()}")
         else:
             print("Nenhum médico encontrado.")
         input("\nPressione ENTER para continuar...")
@@ -90,10 +90,11 @@ class MedicoView:
 
         if opcao == '1':
             # Buscar por ID
-            id_medico = validar_inteiro(input("Digite o ID do médico: "), "ID do Médico")
+            id_medico = input("Digite o ID do médico: ")
             if id_medico is None: return
 
-            medico = self.controller.buscar_medico(id_medico)
+            medico = self.controller.buscar_medico(int(id_medico))
+            
             if medico:
                 print(f"ID: {medico[0]}, CRM: {medico[1]}, Nome: {medico[2]}, Especialidade: {medico[3]}")
             else:
@@ -108,6 +109,7 @@ class MedicoView:
                     print(f"ID: {medico[0]}, CRM: {medico[1]}, Nome: {medico[2]}, Especialidade: {medico[3]}")
             else:
                 print("Nenhum médico encontrado com esse nome.")
+        
         else:
             print("Opção inválida!")
 
@@ -142,14 +144,31 @@ class MedicoView:
 
         input("\nPressione ENTER para voltar ao menu...")
 
+    def listar_todos_pacientes(self):
+        refresh()
+        AppTitle.display_title()
+        print("\nLista de Todos os Pacientes:\n")
+        
+        # Obtém todos os pacientes do controller
+        pacientes = self.controller.listar_todos_pacientes()
+        
+        if pacientes:
+            for paciente in pacientes:
+                print(f"ID: {paciente.getIdPaciente()}, Nome: {paciente.getNome()}, CPF: {paciente.getCpf()}, Sexo: {paciente.getSexo()}, Data de Nascimento: {paciente.getDataNascimento()}, Telefone: {paciente.getTelefone()}, Email: {paciente.getEmail()}, CEP: {paciente.getCep()}")
+        else:
+            print("Nenhum paciente encontrado.")
+        
+        input("\nPressione ENTER para voltar ao menu...")
+
+
 
     def deletar_medico(self):
         refresh()
         AppTitle.display_title()
-        id_medico = validar_inteiro(input("Digite o ID do médico a ser deletado: "), "ID do Médico")
+        id_medico = input("Digite o ID do médico a ser deletado: ")
         if id_medico is None: return
 
-        self.controller.deletar_medico(id_medico)
+        self.controller.deletar_medico(int(id_medico))
         input("\nPressione ENTER para voltar ao menu...")
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ from datetime import date
 class Medico:
     from typing import Optional
 
-    def __init__(self, nome:str, crm:str, telefone:str, email:str, cep:str, data_nascimento:date, data_contratacao:date, data_registro:date, id_especialidade:int, id_medico:Optional[int]=None):
+    def __init__(self, nome:str, crm:str, telefone:str, email:str, cep:str, data_nascimento:str, data_contratacao:str, data_registro:str, id_especialidade:int, id_medico:Optional[int]=None):
         self.id_medico = id_medico
         self.setNome(nome)
         self.setCrm(crm)

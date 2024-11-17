@@ -1,67 +1,52 @@
-import sys
-sys.path.append('.')
-
-from src.database.Database import DatabaseConnection
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 from src.app.models.consulta import Consulta
-import cx_Oracle
 
 class ConsultaController:
     def __init__(self):
-        self.db = DatabaseConnection()
+        self.client = MongoClient('mongodb://localhost:27017/')
+        self.db = self.client['clinicadb']
+        self.collection = self.db['consultas']
 
     def criar_consulta(self, consulta: Consulta):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
+            # Recupera o último ID usado na coleção, ordenando por id_consulta
+            last_consulta = self.collection.find_one(sort=[("id_consulta", -1)])
+            new_id = (last_consulta['id_consulta'] + 1) if last_consulta else 1  # Incrementa ou define como 1
 
-            sql = '''INSERT INTO consultas 
-                     (horario_consulta_realizada, relatorios, status, data_criacao, id_paciente, id_medico) 
-                     VALUES (:horario_consulta_realizada, :relatorios, :status, :data_criacao, :id_paciente, :id_medico)
-                     RETURNING id_consulta INTO :id_consulta'''
-            
-            id_consulta_var = cursor.var(int)  # Variável para capturar o ID gerado
-            cursor.execute(sql, {
-                'horario_consulta_realizada': consulta.getHorarioConsultaRealizada(),
+            consulta_dict = {
+                'id_consulta': new_id,  # ID inteiro para referência
+                'horario_consulta_realizada': str(consulta.getHorarioConsultaRealizada()),
                 'relatorios': consulta.getRelatorios(),
                 'status': consulta.getStatus(),
-                'data_criacao': consulta.getDataCriacao(),
-                'id_paciente': consulta.getIdPaciente(),
-                'id_medico': consulta.getIdMedico(),
-                'id_consulta': id_consulta_var
-            })
+                'data_criacao': str(consulta.getDataCriacao()),
+                'id_paciente': int(consulta.getIdPaciente()),
+                'id_medico': int(consulta.getIdMedico())
+            }
 
-            consulta.setIdConsulta(id_consulta_var.getvalue()[0])  # Define o ID gerado na consulta
+            # Insere a consulta no banco de dados
+            result = self.collection.insert_one(consulta_dict)
 
-            if self.db.connection:
-                self.db.connection.commit()
-                print("Consulta criada com sucesso.")
+            # Define o ID da consulta no objeto Consulta
+            consulta.setIdConsulta(new_id)
+            print(f"Consulta criada com sucesso com ID: {new_id}.")
         
         except Exception as e:
             print(f"Erro ao criar consulta: {e}")
-            if self.db.connection:
-                self.db.connection.rollback()
-        
-        finally:
-            self.db.disconnect()
 
-    def buscar_consulta(self, id_consulta):
+    def buscar_consulta(self, id_consulta: int):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-            
-            sql = "SELECT * FROM consultas WHERE id_consulta = :id_consulta"
-            cursor.execute(sql, {'id_consulta': id_consulta})
-            consulta = cursor.fetchone()
-            
+            # Busca a consulta pelo id_consulta
+            consulta = self.collection.find_one({"id_consulta": id_consulta})
             if consulta:
                 return Consulta(
-                    horario_consulta_realizada=consulta[1],
-                    relatorios=consulta[2],
-                    status=consulta[3],
-                    data_criacao=consulta[4],
-                    id_paciente=consulta[5],
-                    id_medico=consulta[6],
-                    id_consulta=consulta[0]
+                    horario_consulta_realizada=consulta['horario_consulta_realizada'],
+                    relatorios=consulta['relatorios'],
+                    status=consulta['status'],
+                    data_criacao=consulta['data_criacao'],
+                    id_paciente=consulta['id_paciente'],
+                    id_medico=consulta['id_medico'],
+                    id_consulta=consulta['id_consulta']
                 )
             else:
                 print("Consulta não encontrada.")
@@ -69,89 +54,97 @@ class ConsultaController:
 
         except Exception as e:
             print(f"Erro ao buscar consulta: {e}")
-        
-        finally:
-            self.db.disconnect()
+            return None
 
     def atualizar_consulta(self, consulta: Consulta):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-
-            sql = '''UPDATE consultas SET 
-                     horario_consulta_realizada = :horario_consulta_realizada,
-                     relatorios = :relatorios, 
-                     status = :status,
-                     data_criacao = :data_criacao,
-                     id_paciente = :id_paciente, 
-                     id_medico = :id_medico 
-                     WHERE id_consulta = :id_consulta'''
-            
-            cursor.execute(sql, {
-                'horario_consulta_realizada': consulta.getHorarioConsultaRealizada(),
+            consulta_dict = {
+                'horario_consulta_realizada': str(consulta.getHorarioConsultaRealizada()),
                 'relatorios': consulta.getRelatorios(),
                 'status': consulta.getStatus(),
-                'data_criacao': consulta.getDataCriacao(),
-                'id_paciente': consulta.getIdPaciente(),
-                'id_medico': consulta.getIdMedico(),
-                'id_consulta': consulta.getIdConsulta()
-            })
-            
-            if self.db.connection:
-                self.db.connection.commit()
+                'data_criacao': str(consulta.getDataCriacao()),
+                'id_paciente': int(consulta.getIdPaciente()),
+                'id_medico': int(consulta.getIdMedico())
+            }
+
+            # Atualiza a consulta com base no id_consulta
+            result = self.collection.update_one(
+                {'id_consulta': consulta.getIdConsulta()},  # Busca pelo id_consulta (inteiro)
+                {'$set': consulta_dict}  # Define os novos valores
+            )
+
+            if result.modified_count > 0:
                 print("Consulta atualizada com sucesso.")
+            else:
+                print("Nenhuma alteração foi feita. Verifique os dados.")
         
         except Exception as e:
             print(f"Erro ao atualizar consulta: {e}")
-            if self.db.connection:
-                self.db.connection.rollback()
-        
-        finally:
-            self.db.disconnect()
 
     def listar_todas_consultas(self):
-        """
-        Retorna uma lista com todos as consultas.
-        """
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-
-            sql = """
-                SELECT c.id_consulta, c.data_criacao, c.horario_consulta_realizada, c.status, p.nome AS nome_paciente, m.nome AS nome_medico, e.nome_especialidade
-                FROM consultas c                
-                JOIN medicos m ON c.id_medico = m.id_medico
-                JOIN pacientes p ON c.id_paciente = p.id_paciente
-                JOIN especialidades e ON m.id_especialidade = e.id_especialidade
-            """
-            cursor.execute(sql)
-            consulta = cursor.fetchall()
-
-            return consulta
+            # Agrega informações das coleções relacionadas
+            consultas = self.collection.aggregate([
+                {
+                    '$lookup': {
+                        'from': 'medicos',
+                        'localField': 'id_medico',
+                        'foreignField': 'id_medico',
+                        'as': 'medico'
+                    }
+                },
+                {
+                    '$lookup': {
+                        'from': 'pacientes',
+                        'localField': 'id_paciente',
+                        'foreignField': 'id_paciente',
+                        'as': 'paciente'
+                    }
+                },
+                {
+                    '$lookup': {
+                        'from': 'especialidades',
+                        'localField': 'medico.id_especialidade',
+                        'foreignField': 'id_especialidade',
+                        'as': 'especialidade'
+                    }
+                },
+                {
+                    '$unwind': '$medico'
+                },
+                {
+                    '$unwind': '$paciente'
+                },
+                {
+                    '$unwind': '$especialidade'
+                },
+                {
+                    '$project': {
+                        'nome_paciente': '$paciente.nome',
+                        'nome_medico': '$medico.nome',
+                        'nome_especialidade': '$especialidade.nome_especialidade',
+                        'horario_consulta_realizada': 1,
+                        'relatorios': 1,
+                        'status': 1,
+                        'data_criacao': 1,
+                        'id_consulta': 1
+                    }
+                }
+            ])
+            return list(consultas)
         
         except Exception as e:
             print(f"Erro ao listar consultas: {e}")
             return []
-        
-        finally:
-            self.db.disconnect()
 
-    def deletar_consulta(self, id_consulta):
+    def deletar_consulta(self, id_consulta: int):
         try:
-            self.db.connect()
-            cursor = self.db.get_cursor()
-
-            sql = "DELETE FROM consultas WHERE id_consulta = :id_consulta"
-            cursor.execute(sql, {'id_consulta': id_consulta})
-            
-            if self.db.connection:
-                self.db.connection.commit()
+            # Remove a consulta com base no id_consulta
+            result = self.collection.delete_one({'id_consulta': id_consulta})
+            if result.deleted_count > 0:
                 print("Consulta deletada com sucesso.")
+            else:
+                print("Nenhuma consulta encontrada com o ID fornecido.")
         
         except Exception as e:
             print(f"Erro ao deletar consulta: {e}")
-            if self.db.connection:
-                self.db.connection.rollback()
-        
-        finally:
-            self.db.disconnect()

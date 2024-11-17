@@ -1,6 +1,6 @@
 from datetime import date
 class Consulta:
-    def __init__(self, horario_consulta_realizada:date, relatorios:str, data_criacao:date, id_paciente:int, id_medico:int, status:str, id_consulta=None):
+    def __init__(self, horario_consulta_realizada:str, relatorios:str, data_criacao:str, id_paciente:int, id_medico:int, status:str, id_consulta=None):
         self.id_consulta = id_consulta
         self.setHorarioConsultaRealizada(horario_consulta_realizada)
         self.setRelatorios(relatorios)

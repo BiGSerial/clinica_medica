@@ -4,7 +4,8 @@ sys.path.append('.')
 
 import unittest
 from src.database.Database import DatabaseConnection
-import cx_Oracle
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
 
 class TestDatabaseConnection(unittest.TestCase):
 
@@ -21,8 +22,8 @@ class TestDatabaseConnection(unittest.TestCase):
         """
         try:
             self.db.connect()
-            self.assertIsNotNone(self.db.connection, "A conexão não foi estabelecida corretamente.")
-        except Exception as e:
+            self.assertIsNotNone(self.db.client, "A conexão não foi estabelecida corretamente.")
+        except ConnectionFailure as e:
             self.fail(f"Falha ao conectar ao banco de dados: {e}")
         finally:
             self.db.disconnect()
@@ -34,46 +35,48 @@ class TestDatabaseConnection(unittest.TestCase):
         try:
             self.db.connect()
             self.db.disconnect()
-            self.assertIsNone(self.db.connection, "A conexão não foi fechada corretamente.")
-        except Exception as e:
+            self.assertIsNone(self.db.client, "A conexão não foi fechada corretamente.")
+        except ConnectionFailure as e:
             self.fail(f"Falha ao desconectar do banco de dados: {e}")
 
-    def test_get_cursor(self):
+    def test_get_collection(self):
         """
-        Testa se o cursor é retornado corretamente após a conexão.
+        Testa se a coleção é retornada corretamente após a conexão.
         """
         try:
             self.db.connect()
-            cursor = self.db.get_cursor()
-            self.assertIsNotNone(cursor, "Falha ao obter o cursor.")
-        except Exception as e:
-            self.fail(f"Falha ao obter o cursor do banco de dados: {e}")
+            collection = self.db.get_collection('example_collection')
+
+            # Verifique se a coleção realmente existe no banco de dados
+            self.assertIn('example_collection', self.db.list_collection_names(), "A coleção 'example_collection' não existe.")
+        except ConnectionFailure as e:
+            self.fail(f"Falha ao obter a coleção do banco de dados: {e}")
         finally:
             self.db.disconnect()
+
 
     def test_execute_simple_query(self):
         """
         Testa a execução de uma consulta simples no banco de dados.
         """
-        cursor = None  # Inicializa a variável cursor
+        collection = None  # Inicializa a variável collection
         
         try:
             self.db.connect()
-            cursor = self.db.get_cursor()
+            collection = self.db.get_collection('medicos')
 
-            # Executa uma consulta simples (por exemplo, lista de tabelas)
-            cursor.execute("SELECT table_name FROM user_tables")
-            tables = cursor.fetchall()
+            # Executa uma consulta simples (por exemplo, lista de documentos)
+            documents = collection.find()
 
             # Verifica se o resultado não está vazio
-            self.assertIsInstance(tables, list, "O resultado da consulta não é uma lista.")
-            self.assertGreater(len(tables), 0, "Nenhuma tabela foi encontrada no banco de dados.")
+            self.assertIsInstance(documents, pymongo.cursor.Cursor, "O resultado da consulta não é um cursor.")
+            # Você pode adicionar verificações de quantidade de documentos dependendo do que tiver na coleção
 
-        except cx_Oracle.DatabaseError as e:
+        except ConnectionFailure as e:
             self.fail(f"Erro ao executar consulta: {e}")
         finally:
-            if cursor:
-                cursor.close()
+            if collection:
+                collection.close()  # Se necessário, feche a coleção
             self.db.disconnect()
 
     def tearDown(self):
@@ -81,8 +84,5 @@ class TestDatabaseConnection(unittest.TestCase):
         Limpeza após cada teste.
         Garante que a conexão seja fechada.
         """
-        if self.db.connection:
+        if self.db.client:
             self.db.disconnect()
-
-if __name__ == '__main__':
-    unittest.main()
